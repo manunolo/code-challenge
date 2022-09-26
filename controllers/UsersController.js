@@ -1,20 +1,21 @@
 const db = require('../database/models');
-const sequelize = db.sequelize;
 
 module.exports = {
-    register:(req, res) => {
-        db.transaction();
+    register:async (req, res) => {
+        let transaction = await db.sequelize.transaction();
+        let retorno;
         try{
-            let retorno = db.Users.create(req.body).then((usuario)=>{
+            retorno = db.Users.create(req.body,{transaction}).then((usuario)=>{
                 return {
                     data:usuario,
                     status:200
                 };
             });
-            db.commit();
+            transaction.commit();
         } catch(error){
-            db.rollback();
-            let retorno = {
+            console.log(db.sequelize);
+            transaction.rollback();
+            retorno = {
                 error:"Hubo un error en base de datos, intente mas tarde",
                 status:500
             }
@@ -24,7 +25,7 @@ module.exports = {
             res.json(retorno)
         })
     },
-    list:(req, res) => {
+    list:async (req, res) => {
         let usuarios = db.Users.findAll().then((usuarios)=>{
             return usuarios;
         });
