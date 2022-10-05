@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import peticion from './helpers/helper';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 import "./registro.css";
 
 
@@ -11,97 +12,99 @@ export default function Registro() {
   let [telefono, setTelefono] = useState(null);
   let [email, setEmail] = useState(null);
   let [domicilio, setDomicilio] = useState(null);
+  let [message, setMessage] = useState(null);
 
-  function confirmRegistro(){
-    let respuesta = peticion("users/register",{
-        nombre,
-        apellido,
-        dni,
-        telefono,
-        email,
-        domicilio,
-        categoria: 'User'
-    }).then((respuesta)=>{
-        if(respuesta.data.status){
-
-        }
-    });
+  const confirmRegistro = async (event)=>{
+    event.preventDefault(); 
+    if(nombre != null || apellido != null || dni != null || telefono != null || email != null || domicilio!= null){
+        await fetch("http://localhost:8080/users/register",{
+            method: 'POST',
+            headers:{
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nombre,
+                apellido,
+                dni,
+                telefono,
+                email,
+                domicilio,
+                categoria: 'User'
+            }),
+            mode:'cors',
+        }).then((respuesta)=>{
+            return respuesta.json();
+        }).then((resp)=>{
+            setMessage("Se creo con exito su usuario");
+        });
+    } else {
+        setMessage("Debe completar los campos")
+    }
   }
-
-  function clickRegistro() {
-    console.log('registro')
-  }
-
 
   return (
-    <div className="registerForm">
-      <div className="register">
-        <h1>Registrate!</h1>
-        <p>Complete los siguientes datos para su registro</p>
-        <form method="POST" onSubmit={confirmRegistro}>
-          <div>
-            <input
-              type="text"
-              id="nombre"
-              placeholder="Nombre"
-              required="required"
-              onChange={(elemento) => setName(elemento.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type="text"
-              id="apellido"
-              placeholder="Apellido"
-              required="required"
-              onChange={(elemento) => setApellido(elemento.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type="number"
-              name="dni"
-              id="dni"
-              placeholder="DNI"
-              required="required"
-              onChange={(elemento) => setDni(elemento.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type="number"
-              name="telefono"
-              id="telefono"
-              placeholder="Teléfono"
-              required="required"
-              onChange={(elemento) => setTelefono(elemento.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="E-mail"
-              required="required"
-              onChange={(elemento) => setEmail(elemento.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type="text"
-              name="domicilio"
-              id="domicilio"
-              placeholder="Dirección"
-              required="required"
-              onChange={(elemento) => setDomicilio(elemento.target.value)}
-            />
-          </div>
-          <div>
-            <button type="submit" onClick={clickRegistro}>Registrarse</button>
-          </div>
-        </form>
-      </div>
+    <div className="w-100 m-auto">
+        <Form onSubmit={confirmRegistro} className="m-auto col-5 mt-5">
+            <Form.Group className="mb-3">
+                <center className="w-100"><h1>Registrate!</h1></center>
+                <center className="w-100"><p>Complete los siguientes datos para su registro</p></center>
+                <Form.Control
+                    required
+                    className="mt-3" 
+                    type="text"
+                    id="nombre"
+                    placeholder="Nombre"
+                    onChange={(elemento) => setName(elemento.target.value)}
+                />
+                <Form.Control
+                    required
+                    className="mt-3" 
+                    type="text"
+                    id="apellido"
+                    placeholder="Apellido"
+                    onChange={(elemento) => setApellido(elemento.target.value)}
+                />
+                <Form.Control
+                    required
+                    className="mt-3" 
+                    type="number"
+                    name="dni"
+                    id="dni"
+                    placeholder="DNI"
+                    onChange={(elemento) => setDni(elemento.target.value)}
+                />
+                <Form.Control
+                    required
+                    className="mt-3" 
+                    type="number"
+                    name="telefono"
+                    id="telefono"
+                    placeholder="Teléfono"
+                    onChange={(elemento) => setTelefono(elemento.target.value)}
+                />
+                <Form.Control
+                    required
+                    className="mt-3" 
+                    type="email"
+                    placeholder="E-mail"
+                    id="email"
+                    onChange={(element) => setEmail(element.target.value)}
+                />
+                <Form.Control
+                    required
+                    className="mt-3" 
+                    type="text"
+                    name="domicilio"
+                    id="domicilio"
+                    placeholder="Dirección"
+                    onChange={(elemento) => setDomicilio(elemento.target.value)}
+                />
+            </Form.Group>
+            <Button variant="primary" className="w-100" type="submit">Ingresar</Button>
+            <Form.Text className="text-danger w-100 text-center">
+                {<h3 className="">{message}</h3>}
+            </Form.Text>
+        </Form>
     </div>
   );
 }

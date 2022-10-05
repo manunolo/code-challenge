@@ -1,13 +1,10 @@
-const {body} = require('express-validator');
+const { body } = require('express-validator');
 
 module.exports = [
-    body('nombre'),
-    body('apellido'),
-    body('dni'),
-    body('telefono'),
-    body('email'),
-    body('domicilio'),
-    body('categoria'),
-    body('email').isEmail().withMessage('Email: Debe ingresar un formato valido de Email'),
-    body('password').notEmpty().withMessage('Contraseña: Debe ingresar una contraseña').isLength({min: 5}).withMessage('Contraseña: Minimo de 4 caracteres'),
-];
+    body('nombre').notEmpty().withMessage('Ingrese su nombre').isLength({ min: 2 }).withMessage('Su nombre debe contener más de dos caracteres'),
+    body('apellido').notEmpty().withMessage('Ingrese su apellido').isLength({ min: 2 }).withMessage('Su apellido debe contener más de dos caracteres'),
+    body('dni').notEmpty().withMessage('Ingrese un DNI').isNumeric(),
+    body('telefono').notEmpty().withMessage('Ingrese un teléfono').isNumeric(),
+    body('email').notEmpty().isEmail().withMessage('Ingrese un email válido'),
+    body('domicilio').notEmpty().withMessage('Ingrese un email domicilio'),
+]

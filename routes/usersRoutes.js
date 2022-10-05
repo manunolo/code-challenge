@@ -1,10 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var usersController = require('../controllers/usersController');
+var checkTokenMiddleware = require('../middlewares/checkTokenMiddleware');
 
-// Listado de usuarios
-router.get('/list', usersController.list);
-// Registro de un nuevo usuario
+router.get('/list', checkTokenMiddleware, usersController.list);
 router.post('/register', usersController.register);
 
 module.exports = router;

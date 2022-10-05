@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import peticion from "./helpers/helper";
 import FilaUsuario from './filaUsuario'
+import Table from 'react-bootstrap/Table';
+import peticion from './helpers/helper'
 import './index.css';
 
 export default function Index() {
@@ -9,26 +10,22 @@ export default function Index() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!window.sessionStorage.getItem('name') || window.sessionStorage.getItem('name')==='undefined' || registers()){
-            navigate('/login');
+        if (!window.sessionStorage.getItem('token')){
+            return navigate('/login');
         }
-    });
+        const registers = async () => {
+            peticion('users/list','GET').then(response => {
+                adminUsers(response);
+            });
+        }
 
-    const registers = async () => {
-        let respuesta = peticion('GET','users/list', '',window.sessionStorage.getItem('token'));
-        if (respuesta.status === 200) {
-            adminUsers(respuesta.data);
-            return true;
-        } else {
-            window.sessionStorage.clear();
-            return false
-        }
-    }
+        registers();
+    }, []);
 
     return(
         <div>
             <h2>Listado de usuarios</h2>
-            <table>
+            <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>Nombre</th>
@@ -40,21 +37,21 @@ export default function Index() {
                     </tr>
                 </thead>
                 <tbody>
-                    {
-                        dataUsers.map(userData => {
-                            return <FilaUsuario
-                                nombre={userData.nombre}
-                                apellido={userData.apellido}
-                                dni={userData.dni}
-                                telefono={userData.telefono}
-                                email={userData.email}
-                                domicilio={userData.domicilio}
-                                key={`usuario${userData.id}`}
-                            />
-                        })
-                    }
+                        {
+                            dataUsers.map(userData => {
+                                return <FilaUsuario
+                                    nombre={userData.nombre}
+                                    apellido={userData.apellido}
+                                    dni={userData.dni}
+                                    telefono={userData.telefono}
+                                    email={userData.email}
+                                    domicilio={userData.domicilio}
+                                    key={`usuario${userData.id}`}
+                                />
+                            })
+                        }
                 </tbody>
-            </table>
+            </Table>
         </div>
     );
 }

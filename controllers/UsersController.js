@@ -1,40 +1,30 @@
-const db = require('../database/models');
+const { sequelize, Users } = require("../database/models");
 
 module.exports = {
-    register:async (req, res) => {
-        let transaction = await db.sequelize.transaction();
-        let retorno;
-        try{
-            retorno = db.Users.create(req.body,{transaction}).then((usuario)=>{
-                return {
-                    data:usuario,
-                    status:200
-                };
-            });
-            transaction.commit();
-        } catch(error){
-            console.log(db.sequelize);
-            transaction.rollback();
-            retorno = {
-                error:"Hubo un error en base de datos, intente mas tarde",
-                status:500
+    register: async (req, res) => {
+        const transaction = await sequelize.transaction();
+        try {
+            const usuario = await Users.create(req.body, { transaction });
+            if (usuario) {
+                await transaction.commit();
+                return res.json(usuario);
             }
+            res.status(400).json({
+                message:"Hubo un error inesperado al intentar registrar el usuario, por favor reintente",
+            });
+        } catch (error) {
+            await transaction.rollback();
+            return res.status(500).json("Hubo un error en base de datos, intente mas tarde", error);
         }
-
-        Promise.all([retorno]).then(([retorno])=>{
-            res.json(retorno)
-        })
     },
-    list:async (req, res) => {
-        let usuarios = db.Users.findAll().then((usuarios)=>{
-            return usuarios;
-        });
-
-        Promise.all([usuarios]).then(([usuarios]) => {
+    list: (req, res) => {
+        Users.findAll().then((usuarios)=>{
             res.json({
-                data: usuarios,
-                status: 200
-            })
-        })
+                data : usuarios,
+                status : 200,
+            });
+        }).catch((err) => {
+            return res.status(500).json("Hubo un error en base de datos, intente mas tarde", error);
+        });
     },
-}
+};
